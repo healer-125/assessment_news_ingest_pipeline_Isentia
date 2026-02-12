@@ -20,9 +20,12 @@ class Config:
     AWS_REGION: str = os.getenv("AWS_REGION", "us-east-1")
     KINESIS_STREAM_NAME: str = os.getenv("KINESIS_STREAM_NAME", "news-ingest-stream")
     KINESIS_BATCH_SIZE: int = int(os.getenv("KINESIS_BATCH_SIZE", "500"))
+    # Optional: set for LocalStack (e.g. http://localhost:4566)
+    AWS_ENDPOINT_URL: Optional[str] = os.getenv("AWS_ENDPOINT_URL") or None
     
     # Application Configuration
     POLL_INTERVAL_SECONDS: int = int(os.getenv("POLL_INTERVAL_SECONDS", "300"))  # 5 minutes
+    HOURS_BACK: int = int(os.getenv("HOURS_BACK", "168"))  # 7 days - NewsAPI date range
     MAX_RETRIES: int = int(os.getenv("MAX_RETRIES", "3"))
     RETRY_DELAY_SECONDS: int = int(os.getenv("RETRY_DELAY_SECONDS", "5"))
     

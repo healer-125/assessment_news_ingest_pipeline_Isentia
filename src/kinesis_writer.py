@@ -1,7 +1,7 @@
 import logging
 import json
 import time
-from typing import List, Dict
+from typing import List, Dict, Optional
 import boto3
 from botocore.exceptions import ClientError, BotoCoreError
 
@@ -13,17 +13,26 @@ logger = logging.getLogger(__name__)
 class KinesisWriter:
     """Writer for streaming data to AWS Kinesis."""
     
-    def __init__(self, stream_name: str, region: str = "us-east-1"):
+    def __init__(
+        self,
+        stream_name: str,
+        region: str = "us-east-1",
+        endpoint_url: Optional[str] = None,
+    ):
         """
         Initialize Kinesis writer.
-        
+
         Args:
             stream_name: Name of the Kinesis stream
             region: AWS region
+            endpoint_url: Optional custom endpoint (e.g. http://localhost:4566 for LocalStack)
         """
         self.stream_name = stream_name
         self.region = region
-        self.client = boto3.client('kinesis', region_name=region)
+        client_kwargs: Dict = {"region_name": region}
+        if endpoint_url:
+            client_kwargs["endpoint_url"] = endpoint_url
+        self.client = boto3.client("kinesis", **client_kwargs)
         self.batch_size = Config.KINESIS_BATCH_SIZE
     
     def _put_record(self, data: Dict, partition_key: str = None) -> bool:

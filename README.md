@@ -59,12 +59,29 @@ Required variables:
 
 ### 4. Create AWS Kinesis Stream
 
+**Real AWS:**
+
 ```bash
 aws kinesis create-stream \
   --stream-name news-ingest-stream \
   --shard-count 1 \
   --region us-east-1
 ```
+
+**LocalStack (local development):**
+
+```bash
+# Start LocalStack first
+docker run --rm -d -p 4566:4566 --name localstack localstack/localstack
+
+# Create the stream against LocalStack
+aws --endpoint-url=http://localhost:4566 kinesis create-stream \
+  --stream-name news-ingest-stream \
+  --shard-count 1 \
+  --region us-east-1
+```
+
+Then set in `.env`: `AWS_ENDPOINT_URL=http://localhost:4566` and use `AWS_ACCESS_KEY_ID=test`, `AWS_SECRET_ACCESS_KEY=test`. After that, `python -m src.main` will use LocalStack.
 
 ## Usage
 
@@ -110,8 +127,10 @@ All configuration is done via environment variables:
 | `NEWSAPI_PAGE_SIZE` | Results per page | `100` |
 | `NEWSAPI_SORT_BY` | Sort order | `publishedAt` |
 | `KINESIS_STREAM_NAME` | Kinesis stream name | Required |
+| `AWS_ENDPOINT_URL` | Custom endpoint (e.g. LocalStack: `http://localhost:4566`) | — |
 | `AWS_REGION` | AWS region | `us-east-1` |
 | `POLL_INTERVAL_SECONDS` | Polling interval | `300` (5 min) |
+| `HOURS_BACK` | Hours to look back for articles | `168` (7 days) |
 | `LOG_LEVEL` | Logging level | `INFO` |
 
 ## Data Schema
